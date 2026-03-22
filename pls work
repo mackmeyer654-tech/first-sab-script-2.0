@@ -84,6 +84,7 @@ local targets = {
 ["Los Tacoritas"] = true,
 ["Celestial Pegasus"] = true,
 ["Los Hotspotsitos"] = true,
+["noobini pizzanini"] = true,
 ["Money Money Puggy"] = true,
 ["Fragrama and Chocrama"] = true,
 ["Sammyni Fattini"] = true,
